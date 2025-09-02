@@ -173,6 +173,70 @@ class TestAccountService(TestCase):
     
         # Assert the returned data is correct
         updated_account = response.get_json()
-        self.assertEqual(updated_account["name"], "Something New")     
+        self.assertEqual(updated_account["name"], "Something New")
+
+    def test_delete_account(self):
+        """It should Delete an Account"""
+        # Create 5 accounts
+        test_accounts = self._create_accounts(5)
+        # Get the count of accounts before deletion
+        account_count = self.get_account_count()
+        # Get one of the accounts to delete
+        account_to_delete = test_accounts[0]
+    
+        # Send a DELETE request
+        response = self.client.delete(f"{BASE_URL}/{account_to_delete.id}")
+    
+        # Assert the call was successful (204 No Content)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # Assert the response body is empty
+        self.assertEqual(len(response.data), 0)
+    
+        # Make another GET request for the deleted account and assert it's not found
+        response = self.client.get(f"{BASE_URL}/{account_to_delete.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+        # Assert that the number of accounts is now one less
+        self.assertEqual(self.get_account_count(), account_count - 1)         
+    def get_account_count(self):
+        """save the current number of accounts"""
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        return len(data)
+
+
+    def get_account_count(self):
+        """sends a request to get the number of accounts"""
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        return len(data)
+
+
+
+
+    def test_delete_account(self):
+        """It should Delete an Account"""
+        # Create an account to delete
+        test_account = self._create_accounts(1)[0]
+        
+        # Check the count before deleting
+        initial_count = self.get_account_count()
+        
+        # Send the DELETE request
+        response = self.client.delete(f"{BASE_URL}/{test_account.id}")
+        
+        # 1. Assert that the response is correct (204 No Content, empty body)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        
+        # 2. Assert that the account is truly gone by trying to get it again
+        response = self.client.get(f"{BASE_URL}/{test_account.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        
+        # 3. Assert that the total number of accounts is now one less
+        final_count = self.get_account_count()
+        self.assertEqual(final_count, initial_count - 1)
 
         
