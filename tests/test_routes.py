@@ -158,4 +158,6 @@ class TestAccountService(TestCase):
     
         # Assert that the right number of accounts were returned
         data = response.get_json()
-        self.assertEqual(len(data), 5)    
+        self.assertEqual(len(data), 5) 
+
+        
