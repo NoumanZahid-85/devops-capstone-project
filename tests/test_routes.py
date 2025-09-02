@@ -158,6 +158,21 @@ class TestAccountService(TestCase):
     
         # Assert that the right number of accounts were returned
         data = response.get_json()
-        self.assertEqual(len(data), 5) 
+        self.assertEqual(len(data), 5)
+
+    def test_update_account(self):
+        """It should Update an existing Account"""
+        # Create an account to update
+        test_account = self._create_accounts(1)[0]
+        # Send a PUT request with new data
+        new_data = {"name": "Something New", "email": "new@email.com"}
+        response = self.client.put(f"{BASE_URL}/{test_account.id}", json=new_data)
+    
+        # Assert the call was successful
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+        # Assert the returned data is correct
+        updated_account = response.get_json()
+        self.assertEqual(updated_account["name"], "Something New")     
 
         

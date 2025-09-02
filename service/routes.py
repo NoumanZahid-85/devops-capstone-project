@@ -97,7 +97,31 @@ def get_accounts(account_id):
     # return the serialized account and a 200 OK status code
     return account.serialize(), status.HTTP_200_OK
 
+######################################################################
+# U P D A T E   A N   E X I S T I N G   A C C O U N T
+######################################################################
+@app.route("/accounts/<int:account_id>", methods=["PUT"])
+def update_accounts(account_id):
+    """
+    Update an Account
+    This endpoint will update an Account based on the body that is posted
+    """
+    app.logger.info("Request to update account with id: %s", account_id)
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"Account with id '{account_id}' was not found.")
 
+    # Get the data from the request and update the account
+    data = request.get_json()
+    account.name = data.get("name", account.name)
+    account.email = data.get("email", account.email)
+    account.address = data.get("address", account.address)
+    account.phone_number = data.get("phone_number", account.phone_number)
+    
+    account.update()
+    
+    app.logger.info("Account with ID [%s] updated.", account.id)
+    return account.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE AN ACCOUNT
