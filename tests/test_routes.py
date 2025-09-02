@@ -145,3 +145,17 @@ class TestAccountService(TestCase):
     
         # assert that the call failed with a 404
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_accounts(self):
+        """It should List all Accounts"""
+        # Create some accounts
+        self._create_accounts(5)
+        # Make the GET request
+        response = self.client.get(BASE_URL)
+    
+        # Assert the call was successful
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+        # Assert that the right number of accounts were returned
+        data = response.get_json()
+        self.assertEqual(len(data), 5)    
